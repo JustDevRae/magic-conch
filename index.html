@@ -3,9 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Canvas Rope Animation</title>
+    <title>마법의 소라고동</title>
     <style>
-      /* 페이지 전체의 스크롤 생성 방지 */
       body {
         overflow: hidden;
         margin: 0;
@@ -21,7 +20,7 @@
       }
 
       input {
-        position: absolute; /* 페이지 크기 변화 방지 */
+        position: absolute;
         z-index: 1;
         bottom: 150px;
         left: 50%;
@@ -33,107 +32,118 @@
         transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
       }
 
-      /* 비활성화 상태일 때 */
       input.disabled {
         transform: translateX(-50%) translateY(70vh);
         opacity: 0;
       }
 
-      #status {
+      #answer {
         position: absolute;
         top: 500px;
         font-size: 24px;
         font-weight: bold;
         color: black;
-        opacity: 0; /* 처음에는 숨김 */
+        opacity: 0;
         transition: opacity 0.5s ease-in-out;
       }
     </style>
   </head>
   <body>
     <canvas id="canvas" width="500" height="600"></canvas>
+
     <input type="text" id="input" />
-    <div id="status">아니오</div> <!-- 기본 상태 -->
+    <div id="answer">아니오</div>
 
     <script>
       const canvas = document.getElementById("canvas");
       const ctx = canvas.getContext("2d");
-      const input = document.getElementById("input");
-      const statusText = document.getElementById("status");
+
+      const $input = document.getElementById("input");
+      const $answer = document.getElementById("answer");
 
       let isDragging = false;
-      let hasDragged = false; // 드래그 여부 확인
+      let hasDragged = false;
+
       let mouseX = 250;
       let mouseY = 200;
-      const origin = { x: 250, y: 200 };
-      const maxLength = 200; // 최대 길이 제한
-      const relaxationSpeed = 0.05;
+
+      const initPosition = { x: 250, y: 200 };
+      const maxLength = 200;
+      const returnSpeed = 0.05;
 
       const outerRadius = 20;
       const innerRadius = 5;
 
-      function isInsideDonut(x, y) {
-        const dist = Math.sqrt((x - mouseX) ** 2 + (y - mouseY) ** 2);
-        return dist >= innerRadius && dist <= outerRadius;
+      function isInsideClick(x, y) {
+        const validRadius = Math.sqrt((x - mouseX) ** 2 + (y - mouseY) ** 2);
+        return validRadius >= innerRadius && validRadius <= outerRadius;
       }
 
-      canvas.addEventListener("mousedown", (e) => {
+      // 사용자가 해당 element에서 마우스 버튼을 눌렀을 때 발생
+      canvas.addEventListener("mousedown", (event) => {
         const rect = canvas.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const clickY = e.clientY - rect.top;
 
-        if (isInsideDonut(clickX, clickY)) {
+        const clickX = event.clientX - rect.left;
+        const clickY = event.clientY - rect.top;
+
+        if (isInsideClick(clickX, clickY)) {
           isDragging = true;
-          hasDragged = false; // 드래그 시작 시 false로 초기화
+          hasDragged = false;
         }
       });
 
-      canvas.addEventListener("mousemove", (e) => {
+      // 사용자가 해당 element에서 마우스를 움직였을 때 발생
+      canvas.addEventListener("mousemove", (event) => {
         if (isDragging) {
-          hasDragged = true; // 마우스 이동이 발생하면 true로 설정
+          hasDragged = true;
+
           const rect = canvas.getBoundingClientRect();
-          let newX = e.clientX - rect.left;
-          let newY = e.clientY - rect.top;
 
-          const dx = newX - origin.x;
-          const dy = newY - origin.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+          let clickX = event.clientX - rect.left;
+          let clickY = event.clientY - rect.top;
 
-          if (distance > maxLength) {
-            const angle = Math.atan2(dy, dx);
-            newX = origin.x + maxLength * Math.cos(angle);
-            newY = origin.y + maxLength * Math.sin(angle);
+          const distanceX = clickX - initPosition.x;
+          const distanceY = clickY - initPosition.y;
+
+          const currentDistance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+          if (currentDistance > maxLength) {
+            const angle = Math.atan2(distanceY, distanceX);
+
+            clickX = initPosition.x + maxLength * Math.cos(angle);
+            clickY = initPosition.y + maxLength * Math.sin(angle);
           }
 
-          mouseX = newX;
-          mouseY = newY;
+          mouseX = clickX;
+          mouseY = clickY;
         }
       });
 
+      // 사용자가 해당 element에서 눌렀던 마우스 버튼을 떼었을 때 발생
       canvas.addEventListener("mouseup", () => {
         if (isDragging && hasDragged) {
           // 드래그한 경우에만 input 이동
-          input.classList.add("disabled");
-          input.disabled = true;
+          $input.classList.add("disabled");
+          $input.disabled = true;
 
           // 2초 동안 "..." 텍스트 깜박이기
           let blinkCount = 0;
-          statusText.style.opacity = "1"; // 텍스트 보이게 설정
-          statusText.textContent = "...";
+          $answer.style.opacity = "1"; // 텍스트 보이게 설정
+          $answer.textContent = "...";
           const blinkInterval = setInterval(() => {
-            statusText.textContent = blinkCount % 2 === 0 ? "" : "...";
+            $answer.textContent = blinkCount % 2 === 0 ? "" : "...";
             blinkCount++;
           }, 300);
 
           // 2초 후 랜덤으로 "네" 또는 "아니오" 표시 (처음엔 숨김)
           setTimeout(() => {
             clearInterval(blinkInterval); // 깜박이기 중지
-            statusText.textContent = Math.random() > 0.5 ? "네" : "아니오";
-            statusText.style.opacity = "1"; // 2초 후에만 보이게 설정
+            $answer.textContent = Math.random() > 0.5 ? "네" : "아니오";
+            $answer.style.opacity = "1"; // 2초 후에만 보이게 설정
 
             // 2초 후 input 원래 위치로 복귀
-            input.classList.remove("disabled");
-            input.disabled = false;
+            $input.classList.remove("disabled");
+            $input.disabled = false;
           }, 2000);
         }
 
@@ -144,7 +154,7 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         ctx.beginPath();
-        ctx.moveTo(origin.x, origin.y);
+        ctx.moveTo(initPosition.x, initPosition.y);
         ctx.lineTo(x, y);
         ctx.stroke();
 
@@ -162,8 +172,8 @@
 
       function animate() {
         if (!isDragging) {
-          mouseX += (origin.x - mouseX) * relaxationSpeed;
-          mouseY += (origin.y - mouseY) * relaxationSpeed;
+          mouseX += (initPosition.x - mouseX) * returnSpeed;
+          mouseY += (initPosition.y - mouseY) * returnSpeed;
         }
         drawLine(mouseX, mouseY);
         requestAnimationFrame(animate);
