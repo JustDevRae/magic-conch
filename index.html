@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Canvas Rope Animation</title>
+    <style>
+      /* 페이지 전체의 스크롤 생성 방지 */
+      body {
+        overflow: hidden;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+
+      canvas {
+        border: 1px solid black;
+      }
+
+      input {
+        position: absolute; /* 페이지 크기 변화 방지 */
+        z-index: 1;
+        bottom: 150px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 250px;
+        height: 30px;
+        border-radius: 999px;
+        padding: 5px 15px;
+        transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+      }
+
+      /* 비활성화 상태일 때 */
+      input.disabled {
+        transform: translateX(-50%) translateY(70vh);
+        opacity: 0;
+      }
+
+      #status {
+        position: absolute;
+        top: 500px;
+        font-size: 24px;
+        font-weight: bold;
+        color: black;
+        opacity: 0; /* 처음에는 숨김 */
+        transition: opacity 0.5s ease-in-out;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="500" height="600"></canvas>
+    <input type="text" id="input" />
+    <div id="status">아니오</div> <!-- 기본 상태 -->
+
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const input = document.getElementById("input");
+      const statusText = document.getElementById("status");
+
+      let isDragging = false;
+      let hasDragged = false; // 드래그 여부 확인
+      let mouseX = 250;
+      let mouseY = 200;
+      const origin = { x: 250, y: 200 };
+      const maxLength = 200; // 최대 길이 제한
+      const relaxationSpeed = 0.05;
+
+      const outerRadius = 20;
+      const innerRadius = 5;
+
+      function isInsideDonut(x, y) {
+        const dist = Math.sqrt((x - mouseX) ** 2 + (y - mouseY) ** 2);
+        return dist >= innerRadius && dist <= outerRadius;
+      }
+
+      canvas.addEventListener("mousedown", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        if (isInsideDonut(clickX, clickY)) {
+          isDragging = true;
+          hasDragged = false; // 드래그 시작 시 false로 초기화
+        }
+      });
+
+      canvas.addEventListener("mousemove", (e) => {
+        if (isDragging) {
+          hasDragged = true; // 마우스 이동이 발생하면 true로 설정
+          const rect = canvas.getBoundingClientRect();
+          let newX = e.clientX - rect.left;
+          let newY = e.clientY - rect.top;
+
+          const dx = newX - origin.x;
+          const dy = newY - origin.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance > maxLength) {
+            const angle = Math.atan2(dy, dx);
+            newX = origin.x + maxLength * Math.cos(angle);
+            newY = origin.y + maxLength * Math.sin(angle);
+          }
+
+          mouseX = newX;
+          mouseY = newY;
+        }
+      });
+
+      canvas.addEventListener("mouseup", () => {
+        if (isDragging && hasDragged) {
+          // 드래그한 경우에만 input 이동
+          input.classList.add("disabled");
+          input.disabled = true;
+
+          // 2초 동안 "..." 텍스트 깜박이기
+          let blinkCount = 0;
+          statusText.style.opacity = "1"; // 텍스트 보이게 설정
+          statusText.textContent = "...";
+          const blinkInterval = setInterval(() => {
+            statusText.textContent = blinkCount % 2 === 0 ? "" : "...";
+            blinkCount++;
+          }, 300);
+
+          // 2초 후 랜덤으로 "네" 또는 "아니오" 표시 (처음엔 숨김)
+          setTimeout(() => {
+            clearInterval(blinkInterval); // 깜박이기 중지
+            statusText.textContent = Math.random() > 0.5 ? "네" : "아니오";
+            statusText.style.opacity = "1"; // 2초 후에만 보이게 설정
+
+            // 2초 후 input 원래 위치로 복귀
+            input.classList.remove("disabled");
+            input.disabled = false;
+          }, 2000);
+        }
+
+        isDragging = false;
+      });
+
+      function drawLine(x, y) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.beginPath();
+        ctx.moveTo(origin.x, origin.y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(x, y, outerRadius, 0, Math.PI * 2);
+        ctx.fillStyle = "red";
+        ctx.fill();
+
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.beginPath();
+        ctx.arc(x, y, innerRadius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalCompositeOperation = "source-over";
+      }
+
+      function animate() {
+        if (!isDragging) {
+          mouseX += (origin.x - mouseX) * relaxationSpeed;
+          mouseY += (origin.y - mouseY) * relaxationSpeed;
+        }
+        drawLine(mouseX, mouseY);
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    </script>
+  </body>
+</html>
