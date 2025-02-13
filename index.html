@@ -14,26 +14,50 @@
       }
 
       #box {
+        position: relative;
         width: 500px;
         height: 600px;
-        position: relative;
         margin: 0 auto;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-end;
         flex-direction: column;
       }
 
+      #img {
+        position: absolute;
+        z-index: 1;
+        right: 155px;
+        bottom: 200px;
+        pointer-events: none;
+      }
+
       #canvas {
+        position: absolute;
+        z-index: 2;
         border: 1px solid black;
       }
 
-      #input {
+      #container {
         position: absolute;
-        z-index: 1;
-        bottom: 25%;
-        left: 50%;
-        transform: translateX(-50%);
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 30px;
+        padding: 30px;
+      }
+
+      #answer {
+        font-size: 24px;
+        font-weight: bold;
+        color: black;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+      }
+
+      #input {
         width: 250px;
         height: 30px;
         border-radius: 999px;
@@ -42,26 +66,19 @@
       }
 
       #input.disabled {
-        transform: translateX(-50%) translateY(70vh);
+        transform: translateY(70vh);
         opacity: 0;
-      }
-
-      #answer {
-        position: absolute;
-        bottom: 50%;
-        font-size: 24px;
-        font-weight: bold;
-        color: black;
-        opacity: 0;
-        transition: opacity 0.5s ease-in-out;
       }
     </style>
   </head>
   <body>
     <div id="box">
       <canvas id="canvas" width="500" height="600"></canvas>
-      <input type="text" id="input" placeholder="마법의 소라고동님께 질문하라" />
-      <div id="answer">아니오</div>
+      <img src="/public/conch.webp" alt="conch" id="img" />
+      <div id="container">
+        <div id="answer"></div>
+        <input id="input" type="text" placeholder="마법의 소라고동님께 질문하라" />
+      </div>
     </div>
 
     <script>
@@ -96,6 +113,7 @@
 
       let isDragging = false;
       let hasDragged = false;
+      let isDisabled = false;
 
       let mouseX = 250;
       let mouseY = 200;
@@ -129,8 +147,11 @@
         // drawOuterCircle
         ctx.beginPath();
         ctx.arc(x, y, outerRadius, 0, Math.PI * 2);
-        ctx.fillStyle = "red";
+        ctx.fillStyle = "LightGray";
         ctx.fill();
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+        ctx.stroke();
 
         // drawInnerCircle
         ctx.globalCompositeOperation = "destination-out";
@@ -138,6 +159,12 @@
         ctx.arc(x, y, innerRadius, 0, Math.PI * 2);
         ctx.fill();
         ctx.globalCompositeOperation = "source-over";
+
+        ctx.beginPath();
+        ctx.arc(x, y, innerRadius, 0, Math.PI * 2);
+        ctx.strokeStyle = "black"; // 테두리 색상 설정
+        ctx.lineWidth = 2; // 테두리 두께 설정
+        ctx.stroke();
       }
 
       function setTimeoutPromise(ms) {
@@ -157,6 +184,8 @@
       }
 
       canvas.addEventListener("mousedown", (event) => {
+        if (isDisabled) return;
+
         const rect = canvas.getBoundingClientRect();
 
         const clickX = event.clientX - rect.left;
@@ -164,9 +193,6 @@
 
         if (isInsideClick(clickX, clickY)) {
           isDragging = true;
-          hasDragged = false;
-        } else {
-          isDragging = false;
           hasDragged = false;
         }
       });
@@ -201,6 +227,7 @@
         if (isDragging && hasDragged) {
           isDragging = false;
           hasDragged = false;
+          isDisabled = true;
 
           let blinkCount = 0;
 
@@ -219,7 +246,6 @@
           clearInterval(blinkInterval);
 
           await setTimeoutPromise(1000);
-          // TODO: 무작위 답변 내놓기 기능 추가 예정
 
           if ($input.value.trim() === "") {
             $answer.textContent = "질문을 해";
@@ -233,6 +259,8 @@
           $input.value = "";
           $input.classList.remove("disabled");
           $input.disabled = false;
+
+          isDisabled = false;
         }
       });
 
