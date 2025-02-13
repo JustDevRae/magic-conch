@@ -7,22 +7,31 @@
     <style>
       body {
         overflow: hidden;
-        margin: 0;
+        margin: 0 auto;
         height: 100vh;
+        display: flex;
+        align-items: center;
+      }
+
+      #box {
+        width: 500px;
+        height: 600px;
+        position: relative;
+        margin: 0 auto;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-direction: column;
       }
 
-      canvas {
+      #canvas {
         border: 1px solid black;
       }
 
-      input {
+      #input {
         position: absolute;
         z-index: 1;
-        bottom: 150px;
+        bottom: 25%;
         left: 50%;
         transform: translateX(-50%);
         width: 250px;
@@ -32,14 +41,14 @@
         transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
       }
 
-      input.disabled {
+      #input.disabled {
         transform: translateX(-50%) translateY(70vh);
         opacity: 0;
       }
 
       #answer {
         position: absolute;
-        top: 500px;
+        bottom: 50%;
         font-size: 24px;
         font-weight: bold;
         color: black;
@@ -49,17 +58,18 @@
     </style>
   </head>
   <body>
-    <canvas id="canvas" width="500" height="600"></canvas>
-
-    <input type="text" id="input" />
-    <div id="answer">아니오</div>
+    <div id="box">
+      <canvas id="canvas" width="500" height="600"></canvas>
+      <input type="text" id="input" />
+      <div id="answer">아니오</div>
+    </div>
 
     <script>
-      const canvas = document.getElementById("canvas");
+      const canvas = document.querySelector("#canvas");
       const ctx = canvas.getContext("2d");
 
-      const $input = document.getElementById("input");
-      const $answer = document.getElementById("answer");
+      const $input = document.querySelector("#input");
+      const $answer = document.querySelector("#answer");
 
       let isDragging = false;
       let hasDragged = false;
@@ -126,6 +136,10 @@
 
         if (isInsideClick(clickX, clickY)) {
           isDragging = true;
+          hasDragged = false;
+        } else {
+          isDragging = false;
+          hasDragged = false;
         }
       });
 
@@ -156,32 +170,34 @@
       });
 
       canvas.addEventListener("mouseup", async () => {
-        let blinkCount = 0;
+        if (isDragging && hasDragged) {
+          isDragging = false;
+          hasDragged = false;
 
-        isDragging = false;
-        hasDragged = false;
+          let blinkCount = 0;
 
-        $input.classList.add("disabled");
-        $input.disabled = true;
+          $input.classList.add("disabled");
+          $input.disabled = true;
 
-        $answer.style.opacity = "1";
-        $answer.textContent = "";
+          $answer.style.opacity = "1";
+          $answer.textContent = "";
 
-        const blinkInterval = setInterval(() => {
-          $answer.textContent = blinkCount % 2 === 0 ? "" : "...";
-          blinkCount++;
-        }, 500);
+          const blinkInterval = setInterval(() => {
+            $answer.textContent = blinkCount % 2 === 0 ? "" : "...";
+            blinkCount++;
+          }, 500);
 
-        await setTimeoutPromise(3500);
-        clearInterval(blinkInterval);
+          await setTimeoutPromise(3500);
+          clearInterval(blinkInterval);
 
-        await setTimeoutPromise(1000);
-        $answer.textContent = Math.random() > 0.5 ? "네" : "아니오";
-        $answer.style.opacity = "1";
+          await setTimeoutPromise(1000);
+          $answer.textContent = Math.random() > 0.5 ? "네" : "아니오";
+          $answer.style.opacity = "1";
 
-        await setTimeoutPromise(1500);
-        $input.classList.remove("disabled");
-        $input.disabled = false;
+          await setTimeoutPromise(1500);
+          $input.classList.remove("disabled");
+          $input.disabled = false;
+        }
       });
 
       animate();
