@@ -60,7 +60,7 @@
   <body>
     <div id="box">
       <canvas id="canvas" width="500" height="600"></canvas>
-      <input type="text" id="input" />
+      <input type="text" id="input" placeholder="마법의 소라고동님께 질문하라" />
       <div id="answer">아니오</div>
     </div>
 
@@ -191,10 +191,12 @@
           clearInterval(blinkInterval);
 
           await setTimeoutPromise(1000);
+          // TODO: 무작위 답변 내놓기 기능 추가 예정
           $answer.textContent = Math.random() > 0.5 ? "네" : "아니오";
           $answer.style.opacity = "1";
 
           await setTimeoutPromise(1500);
+          $input.value = "";
           $input.classList.remove("disabled");
           $input.disabled = false;
         }
