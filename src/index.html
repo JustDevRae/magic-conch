@@ -12,7 +12,7 @@
     <main id="main-view">
       <section id="conch-render-section">
         <img src="/public/conch.webp" alt="conch" id="conch-img" />
-        <canvas id="canvas" width="500px" height="500px"></canvas>
+        <canvas id="canvas" width="500px" height="600px"></canvas>
       </section>
       <section id="conch-answer-section">
         <p id="answer"></p>
@@ -54,10 +54,13 @@
       let hasDragged = false;
       let isDisabled = false;
 
-      let mouseX = 275;
-      let mouseY = 220;
+      const INIT_X = 340;
+      const INIT_Y = 340;
 
-      const initPosition = { x: 275, y: 220 };
+      let mouseX = INIT_X;
+      let mouseY = INIT_Y;
+
+      const initPosition = { x: INIT_X, y: INIT_Y };
       const maxLength = 200;
       const returnSpeed = 0.05;
 
@@ -78,6 +81,7 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         // drawLine
+        ctx.strokeStyle = "lightgray";
         ctx.beginPath();
         ctx.moveTo(initPosition.x, initPosition.y);
         ctx.lineTo(x, y);
@@ -86,9 +90,9 @@
         // drawOuterCircle
         ctx.beginPath();
         ctx.arc(x, y, outerRadius, 0, Math.PI * 2);
-        ctx.fillStyle = "LightGray";
+        ctx.fillStyle = "lightgray";
         ctx.fill();
-        ctx.strokeStyle = "black";
+        ctx.strokeStyle = "gray";
         ctx.lineWidth = 2;
         ctx.stroke();
 
