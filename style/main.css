@@ -17,27 +17,29 @@ canvas {
 }
 
 #main-view {
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("/public/background.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
   margin: 0 auto;
-  width: 100%;
+  width: 500px;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 #conch-render-section {
   position: relative;
   width: 500px;
-  height: 500px;
+  height: 600px;
 }
 
 #conch-img {
   position: absolute;
   z-index: 1;
-
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 350px;
   height: 350px;
-  left: 10px;
   pointer-events: none;
 }
 
@@ -47,10 +49,6 @@ canvas {
 }
 
 #conch-answer-section {
-  position: absolute;
-  bottom: 25%;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -60,17 +58,22 @@ canvas {
 #answer {
   font-size: 24px;
   font-weight: bold;
-  color: black;
+  color: white;
   opacity: 0;
   transition: opacity 0.5s ease-in-out;
 }
 
 #input {
+  outline: none;
   width: 250px;
   height: 40px;
   border-radius: 999px;
   padding: 5px 15px;
   transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+#input:hover {
+  transform: scale(1.05);
 }
 
 #input.disabled {
