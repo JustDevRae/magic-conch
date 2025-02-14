@@ -3,83 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/style/reset.css" />
+    <link rel="stylesheet" href="/style/main.css" />
     <title>마법의 소라고동</title>
-    <style>
-      body {
-        overflow: hidden;
-        margin: 0 auto;
-        height: 100vh;
-        display: flex;
-        align-items: center;
-      }
-
-      #box {
-        position: relative;
-        width: 500px;
-        height: 600px;
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        flex-direction: column;
-      }
-
-      #img {
-        position: absolute;
-        z-index: 1;
-        right: 155px;
-        bottom: 200px;
-        pointer-events: none;
-      }
-
-      #canvas {
-        position: absolute;
-        z-index: 2;
-        border: 1px solid black;
-      }
-
-      #container {
-        position: absolute;
-        z-index: 3;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 30px;
-        padding: 30px;
-      }
-
-      #answer {
-        font-size: 24px;
-        font-weight: bold;
-        color: black;
-        opacity: 0;
-        transition: opacity 0.5s ease-in-out;
-      }
-
-      #input {
-        width: 250px;
-        height: 30px;
-        border-radius: 999px;
-        padding: 5px 15px;
-        transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
-      }
-
-      #input.disabled {
-        transform: translateY(70vh);
-        opacity: 0;
-      }
-    </style>
+    <style></style>
   </head>
   <body>
-    <div id="box">
-      <canvas id="canvas" width="500" height="600"></canvas>
-      <img src="/public/conch.webp" alt="conch" id="img" />
-      <div id="container">
-        <div id="answer"></div>
+    <main id="main-view">
+      <section id="conch-render-section">
+        <img src="/public/conch.webp" alt="conch" id="conch-img" />
+        <canvas id="canvas" width="500px" height="500px"></canvas>
+      </section>
+      <section id="conch-answer-section">
+        <p id="answer"></p>
         <input id="input" type="text" placeholder="마법의 소라고동님께 질문하라" />
-      </div>
-    </div>
+      </section>
+    </main>
 
     <script>
       const canvas = document.querySelector("#canvas");
@@ -115,10 +54,10 @@
       let hasDragged = false;
       let isDisabled = false;
 
-      let mouseX = 250;
-      let mouseY = 200;
+      let mouseX = 275;
+      let mouseY = 220;
 
-      const initPosition = { x: 250, y: 200 };
+      const initPosition = { x: 275, y: 220 };
       const maxLength = 200;
       const returnSpeed = 0.05;
 
@@ -162,8 +101,8 @@
 
         ctx.beginPath();
         ctx.arc(x, y, innerRadius, 0, Math.PI * 2);
-        ctx.strokeStyle = "black"; // 테두리 색상 설정
-        ctx.lineWidth = 2; // 테두리 두께 설정
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
         ctx.stroke();
       }
 
