@@ -92,7 +92,7 @@ function drawLineAndCircle(x, y) {
 
   ctx.beginPath();
   ctx.arc(x, y, innerRadius, 0, Math.PI * 2);
-  ctx.strokeStyle = "black";
+  ctx.strokeStyle = "gray";
   ctx.lineWidth = 2;
   ctx.stroke();
 }
