@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://justdevrae.github.io/magic-conch/sitemap.xml

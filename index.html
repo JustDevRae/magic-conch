@@ -3,6 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="description" content="마법의 소라고동님께 질문하고 신비로운 답변을 받아보세요!" />
+    <meta name="keywords" content="스펀지밥, 마법의 소라고동, 소라고동, 질문, 운세, 재미, Magic Conch" />
+    <meta name="author" content="JustDevRae" />
+
     <link rel="stylesheet" href="./style/reset.css" />
     <link rel="stylesheet" href="./style/index.css" />
     <link rel="icon" href="./public/favicon.png" />
@@ -13,7 +18,11 @@
   <body>
     <main id="main-view">
       <section id="conch-render-section">
-        <img src="./public/conch.webp" alt="conch" id="conch-img" />
+        <img
+          src="./public/conch.webp"
+          alt="마법의 소라고동 이미지 - 질문을 하면 신비로운 답변을 받을 수 있습니다."
+          id="conch-img"
+        />
         <canvas id="canvas" width="340px" height="500px"></canvas>
       </section>
       <section id="conch-answer-section">
@@ -21,6 +30,6 @@
         <input id="input" type="text" placeholder="마법의 소라고동님께 질문하라" />
       </section>
     </main>
-    <script src="./src/index.js"></script>
+    <script src="./src/index.js" defer></script>
   </body>
 </html>
